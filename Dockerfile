@@ -31,5 +31,7 @@ USER appuser
 COPY --chown=appuser:appuser . .
 
 EXPOSE 8000
-
-CMD ["flask", "run", "--host", "0.0.0.0", "--port", "8000"]
+#Developement
+#CMD ["flask", "run", "--host", "0.0.0.0", "--port", "8000"]
+#Production
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--threads", "2", "--timeout", "60", "app:app"]
