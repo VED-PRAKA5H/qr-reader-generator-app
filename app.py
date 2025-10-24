@@ -1,36 +1,35 @@
-import random
-
 from flask import (Flask, render_template, request, redirect, url_for, session,
                    flash, jsonify, send_from_directory)
 import os
 from utils import scan_qr_from_image, live_qr_scan, generate_qr
 from flask_bootstrap import Bootstrap5
 
-# 1. Define the absolute path for security and consistency
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+# --- Configuration ---
 
-# 2. Define the directory permissions (e.g., owner can read/write/execute, no one else can)
-# 0o700 is highly restrictive: read, write, and execute permissions only for the file owner.
-# This prevents other users on the system from accessing the uploaded files.
-UPLOAD_DIR_PERMISSIONS = 0o700
+# Always use /tmp for uploads (writable by non-privileged users)
+UPLOAD_FOLDER = '/tmp/uploads'
 
-# 3. Securely set the SECRET_KEY (Example uses os.urandom for development/testing)
-# FOR PRODUCTION: Use a key loaded from an environment variable (e.g., os.environ.get('FLASK_SECRET_KEY'))
-SECRET_KEY = os.urandom(32)
+# Permissions for directory creation
+UPLOAD_DIR_PERMISSIONS = 0o755
 
+# FOR PRODUCTION: Use environment variable
+SECRET_KEY = os.environ.get('FLASK_SECRET_KEY', os.urandom(32))
 
 # --- Application Setup ---
 
-# Create the uploads folder with restrictive permissions if it doesn't exist
+# Create the uploads folder if it doesn't exist
 if not os.path.exists(UPLOAD_FOLDER):
-    # 'mode' parameter explicitly sets the permissions
-    os.makedirs(UPLOAD_FOLDER, mode=UPLOAD_DIR_PERMISSIONS)
-    print(f"Created secure upload directory: {UPLOAD_FOLDER}")
-
+    try:
+        os.makedirs(UPLOAD_FOLDER, mode=UPLOAD_DIR_PERMISSIONS)
+        print(f"Created upload directory: {UPLOAD_FOLDER}")
+    except PermissionError as e:
+        print(f"Warning: Could not create upload directory: {e}")
+        # Directory should already exist from Dockerfile
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = SECRET_KEY
+app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # 1MB max
 bootstrap = Bootstrap5(app)
 
 
@@ -54,18 +53,22 @@ def index():
 def generate_page():
     if request.method == "POST":
         try:
-            data = request.form.get("data")
-            barcode_type = request.form.get("barcode_type")
+            data = request.form.get("data", "").strip()
             image_name = generate_qr(text_data=data, directory=UPLOAD_FOLDER)
-            return render_template("generate.html", image=image_name, active='generate')
+
+            flash("QR code generated successfully!", "success")
+            return render_template(
+                "generate.html",
+                image=image_name,
+                active="generate"
+            )
 
         except Exception as e:
-            # Handle potential errors during save or scan
-            # print(f"An error occurred: {e}")
-            flash("Error processing image.", category='error')
-            redirect(url_for('generate_page'))
+            # print(f"Error: {e}")
+            flash(str(e), "danger")
+            return redirect(url_for("generate_page"))
 
-    return render_template("generate.html", image=None, active='generate')
+    return render_template("generate.html", image=None, active="generate")
 
 
 @app.route("/scan", methods=["GET", "POST"])

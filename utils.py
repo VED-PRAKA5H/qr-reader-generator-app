@@ -1,5 +1,5 @@
 import os
-import shutil
+import time
 import tempfile
 import cv2
 import qrcode
@@ -21,9 +21,35 @@ def scan_qr_from_image(image_path: str):
         return None
 
 
-def generate_qr(text_data: str, directory):
-    """:return image namae"""
-    path = tempfile.mktemp(prefix="qr-", suffix=".png", dir=directory)
+def clear_folder_contents(folder, max_age_seconds=300):
+    """Deletes all files and subdirectories inside a folder."""
+    now = time.time()
+
+    for filename in os.listdir(folder):
+        path = os.path.join(folder, filename)
+        if os.path.isfile(path):
+            if now - os.path.getmtime(path) > max_age_seconds:
+                os.remove(path)
+
+
+def generate_qr(text_data: str, directory: str) -> str:
+    """Generate QR code and return image filename."""
+    if not text_data:
+        raise ValueError("QR data cannot be empty")
+
+    os.makedirs(directory, exist_ok=True)
+
+    # Clear old files first
+    clear_folder_contents(directory)
+
+    with tempfile.NamedTemporaryFile(
+        dir=directory,
+        prefix="qr-",
+        suffix=".png",
+        delete=False
+    ) as tmp:
+        file_path = tmp.name
+
     qr = QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -34,37 +60,9 @@ def generate_qr(text_data: str, directory):
     qr.make(fit=True)
 
     img = qr.make_image(fill_color="black", back_color="white")
-    clear_folder_contents(directory)
-    img.save(path)
-    return path.split('\\')[-1]
+    img.save(file_path)
 
-
-def clear_folder_contents(folder_path):
-    """
-    Deletes all files and subdirectories within the specified folder,
-    but leaves the folder itself intact.
-    """
-    # Ensure the folder exists before attempting to clear it
-    if not os.path.exists(folder_path):
-        print(f"Error: Folder not found at {folder_path}")
-        return
-
-    # Loop through all items in the folder
-    for item_name in os.listdir(folder_path):
-        item_path = os.path.join(folder_path, item_name)
-
-        try:
-            if os.path.isfile(item_path) or os.path.islink(item_path):
-                # If it's a file or a symbolic link, delete it
-                os.remove(item_path)
-                print(f"Deleted file: {item_name}")
-            elif os.path.isdir(item_path):
-                # If it's a subdirectory, recursively delete it and all its contents
-                shutil.rmtree(item_path)
-                print(f"Deleted subdirectory: {item_name}")
-        except Exception as e:
-            # Catch errors like permissions issues
-            print(f"Failed to delete {item_path}. Reason: {e}")
+    return os.path.basename(file_path)
 
 
 def live_qr_scan():

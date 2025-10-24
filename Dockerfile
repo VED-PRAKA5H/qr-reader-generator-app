@@ -16,13 +16,19 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
+# Create upload directory with proper permissions BEFORE switching to appuser
+RUN mkdir -p /tmp/uploads && \
+    chown appuser:appuser /tmp/uploads && \
+    chmod 755 /tmp/uploads
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
 USER appuser
 
-COPY . .
+# Copy with proper ownership
+COPY --chown=appuser:appuser . .
 
 EXPOSE 8000
 
