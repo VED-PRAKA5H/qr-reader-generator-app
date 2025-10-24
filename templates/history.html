@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex flex-column h-auto w-100 position-relative">
+    <div class="d-flex flex-column flex-grow-1">
+        <div class="d-flex flex-grow-1 justify-content-center py-4 p-sm-4 p-md-5">
+            <div class="d-flex w-100 flex-column" style="max-width: 960px;">
+
+                <main class="d-flex flex-column gap-4 px-3 py-4">
+
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div class="d-flex flex-column gap-1">
+                            <p class="fs-2 fw-black lh-sm tracking-neg-3 text-body mb-0">
+                                History
+                            </p>
+                            <p class="fs-6 fw-normal lh-base text-muted mb-0">
+                                Your last 10 generated and scanned codes.
+                            </p>
+                        </div>
+
+                        <form action="#{{ url_for('clear_history') }}" method="POST">
+                            <button type="submit"
+                                class="btn btn-sm btn-link d-inline-flex align-items-center justify-content-center overflow-hidden rounded-lg py-2 px-3 fw-bold text-muted transition-colors hover-bg-light dark-hover-bg-white-10">
+                                <span class="text-truncate">Clear All History</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    {% if history %}
+                    <div class="d-flex flex-column rounded-lg border border-secondary-subtle divide-y-custom">
+
+                        {% for item in history %}
+                        <div
+                            class="d-flex flex-wrap align-items-center gap-3 p-3 justify-content-between bg-white dark-bg-body
+                            {% if loop.first %}rounded-top-lg{% endif %}
+                            {% if loop.last %}rounded-bottom-lg{% endif %}
+                            hover-bg-light-transition">
+
+                            <div class="d-flex align-items-center gap-3 overflow-hidden">
+
+                                <div class="d-flex align-items-center justify-content-center rounded-lg bg-light text-muted flex-shrink-0" style="width: 48px; height: 48px;">
+                                    {% if item.barcode_type == "QR" %}
+                                    <span class="material-symbols-outlined fs-4">qr_code_2</span>
+                                    {% elif item.barcode_type == "SCAN" %}
+                                    <span class="material-symbols-outlined fs-4">qr_code_scanner</span>
+                                    {% else %}
+                                    <span class="material-symbols-outlined fs-4">barcode</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="d-flex flex-column justify-content-center overflow-hidden">
+                                    <p class="fs-6 fw-medium lh-base text-body truncate mb-0">
+                                        {{ item.data }}
+                                    </p>
+                                    <p class="small fw-normal lh-base text-muted mb-0">
+                                        {{ item.barcode_type }} - {{ item.timestamp }}
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div class="d-flex flex-shrink-0 align-items-center gap-2">
+
+                                <button onclick="navigator.clipboard.writeText('{{ item.data }}')" type="button"
+                                    class="btn btn-sm btn-link-secondary d-flex align-items-center justify-content-center gap-1 rounded-md py-1 px-3 fw-medium transition-colors dark-link-secondary-custom">
+                                    <span class="material-symbols-outlined fs-6">content_copy</span> Copy
+                                </button>
+
+                                <a href="#{{ url_for('reuse', id=item.id) }}"
+                                    class="btn btn-sm btn-primary-light d-flex align-items-center justify-content-center gap-1 rounded-md py-1 px-3 fw-medium transition-colors">
+                                    <span class="material-symbols-outlined fs-6">refresh</span> Reuse
+                                </a>
+
+                            </div>
+
+                        </div>
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+                    <div
+                        class="d-flex flex-column align-items-center justify-content-center gap-3 rounded-lg border border-dashed border-secondary-subtle p-5 text-center mt-3">
+                        <div class="d-flex h-14 w-14 align-items-center justify-content-center rounded-circle bg-light dark-bg-white-10">
+                            <span class="material-symbols-outlined fs-3 text-muted">history</span>
+                        </div>
+                        <div class="d-flex flex-column gap-1">
+                            <p class="fs-5 fw-semibold text-body mb-0">No History Yet</p>
+                            <p class="small text-muted mb-0">
+                                Generate or scan a code to see it appear here.
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </main>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

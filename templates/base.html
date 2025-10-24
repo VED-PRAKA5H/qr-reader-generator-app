@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Barcode App{% endblock %}</title>
+    <link rel="icon" type="image/png" href="static/img/icon.png">
+
+    {{ bootstrap.load_css() }}
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=swap" rel="stylesheet"/>
+
+    <link href="static/style.css" rel="stylesheet">
+
+    {% block head %}{% endblock %}
+</head>
+
+<body class="bg-body text-body font-inter">
+
+<header class="sticky-top z-3" style="--bs-zindex: 1020;">
+    <nav class="navbar navbar-expand-sm navbar-light p-0 border-bottom border-secondary-subtle backdrop-filter-blur" id="main-navbar">
+        <div class="container-fluid px-sm-5 px-3 py-3">
+
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <span class="material-symbols-outlined text-primary fs-4">qr_code_2</span>
+                <span class="h1 mb-0 fs-5 fw-bold">Barcode App</span>
+            </a>
+
+            <div class="d-none d-lg-flex justify-content-center flex-grow-1">
+                <div class="nav nav-pills bg-secondary-subtle rounded-pill p-1 border border-secondary-subtle">
+                    {% set nav_links = [
+                        ('/', 'home', 'Home'),
+                        ('/generate', 'generate', 'Generate'),
+                        ('/scan', 'scan', 'Scan'),
+                        ('/history', 'history', 'History')
+                    ] %}
+                    {% for href, name, label in nav_links %}
+                        <a href="{{ href }}" class="nav-link rounded-pill py-1 px-4 fw-semibold transition-colors
+                            {% if active == name %} active text-white bg-primary {% else %} text-secondary hover-bg-light hover-text-primary {% endif %}">
+                            {{ label }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="d-none d-sm-flex gap-2 align-items-center">
+
+                <div class="dropdown custom-dropdown">
+                    <button class="btn btn-outline-secondary dark-btn-outline-light dropdown-toggle d-flex align-items-center justify-content-center"
+                            type="button" id="bd-theme" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="width: 40px; height: 40px; padding: 0;">
+                        <span class="material-symbols-outlined theme-icon-active" id="theme-icon">
+                            {% if request.cookies.get('theme') == 'dark' %}
+                                dark_mode
+                            {% elif request.cookies.get('theme') == 'light' %}
+                                light_mode
+                            {% else %}
+                                contrast
+                            {% endif %}
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme">
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light">
+                                <span class="material-symbols-outlined me-2 opacity-50">light_mode</span>
+                                Light
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark">
+                                <span class="material-symbols-outlined me-2 opacity-50">dark_mode</span>
+                                Dark
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto">
+                                <span class="material-symbols-outlined me-2 opacity-50">contrast</span>
+                                Auto
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <a href="/signup" class="btn btn-primary fw-medium transition-colors">Sign Up</a>
+                <a href="/login" class="btn btn-outline-secondary dark-btn-outline-light fw-medium transition-colors">Log In</a>
+            </div>
+
+            <div class="d-sm-none d-flex align-items-center gap-2">
+                 <button class="btn btn-outline-secondary dark-btn-outline-light p-1 rounded-3 pb-0" type="button" id="mobileThemeToggle" onclick="toggleTheme()">
+                     <span class="material-symbols-outlined fs-4 theme-icon-active" id="mobile-theme-icon">
+                        {% if request.cookies.get('theme') == 'dark' %}
+                            dark_mode
+                        {% elif request.cookies.get('theme') == 'light' %}
+                            light_mode
+                        {% else %}
+                            contrast
+                        {% endif %}
+                    </span>
+                </button>
+                <button class="navbar-toggler p-1 rounded-3" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenuCollapse" aria-controls="mobileMenuCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="material-symbols-outlined fs-4">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="collapse navbar-collapse d-sm-none w-100 bg-body shadow-lg" id="mobileMenuCollapse">
+        <div class="container-fluid px-3 pb-4">
+            <nav class="d-flex flex-column gap-2 pt-3">
+                {% for href, name, label in nav_links %}
+                    <a href="{{ href }}" class="btn btn-lg rounded-3 fw-semibold transition-colors text-center
+                        {% if active == name %} btn-primary text-white {% else %} btn-light dark-btn-outline-light text-secondary {% endif %}">
+                        {{ label }}
+                    </a>
+                {% endfor %}
+            </nav>
+            <div class="d-flex flex-column gap-3 pt-3 mt-3 border-top border-secondary-subtle">
+                <a href="/signup" class="btn btn-primary btn-lg fw-medium transition-colors text-center">Sign Up</a>
+                <a href="/login" class="btn btn-outline-secondary dark-btn-outline-light btn-lg transition-colors text-center">Log In</a>
+            </div>
+        </div>
+    </div>
+</header>
+    <div class="container-fluid px-3 py-3" style="max-width: 960px;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    </div>
+    <main class="container-fluid px-sm-5 px-3 py-5">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="w-100 border-top border-secondary-subtle bg-body-tertiary backdrop-filter-blur">
+        <div class="container-fluid px-sm-5 px-3 py-5">
+            <div class="row g-4 justify-content-center">
+
+                <div class="col-6 col-md-3">
+                    <h4 class="fs-5 fw-bold mb-3">Product</h4>
+                    <ul class="list-unstyled space-y-2 small">
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary ">Generator</a></li>
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary ">Scanner</a></li>
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary ">Pricing</a></li>
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary ">Formats</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <h4 class="fs-5 fw-bold mb-3">Company</h4>
+                    <ul class="list-unstyled space-y-2 small">
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary">About Us</a></li>
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary">Careers</a></li>
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary">Contact</a></li>
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary">Blog</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <h4 class="fs-5 fw-bold mb-3">Resources</h4>
+                    <ul class="list-unstyled space-y-2 small">
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary">Help Center</a></li>
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary">API Documentation</a></li>
+                        <li><a href="#" class="text-secondary-emphasis link-hover-primary">Security</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-primary fs-4">qr_code_2</span>
+                        <span class="h1 mb-0 fs-5 fw-bold">Barcode App</span>
+                    </div>
+                    <p class="text-muted small">&copy; {{ year }} Barcode App, Inc. All rights reserved.</p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="#" class="text-secondary-emphasis hover-text-primary"><span class="material-symbols-outlined">alternate_email</span></a>
+                        <a href="#" class="text-secondary-emphasis hover-text-primary"><span class="material-symbols-outlined">chat</span></a>
+                        <a href="#" class="text-secondary-emphasis hover-text-primary"><span class="material-symbols-outlined">rocket_launch</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {{ bootstrap.load_js() }}
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

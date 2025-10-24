@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex flex-column min-vh-100 w-100">
+
+    <section class="w-100 container-fluid pt-5 pb-4 px-3 px-sm-5 text-center mx-auto" style="max-width: 1400px;">
+        <h1 class="display-3 display-lg-1 fw-bolder lh-sm mb-4 tracking-neg-5 text-body">
+            The <span class="text-primary">Easiest Way</span> to Generate Codes.
+        </h1>
+        <p class="text-secondary-emphasis fs-5 fs-md-4 fw-normal lh-base mx-auto mb-5" style="max-width: 650px;">
+            Instantly create high-resolution Barcodes (EAN, UPC, Code128) and QR Codes for inventory, marketing, and logistics, all in one place.
+        </p>
+
+        <a href="{{ url_for('generate_page') }}"
+            class="btn btn-primary d-inline-flex align-items-center justify-content-center mx-auto overflow-hidden rounded-xl py-3 px-5 h-lg-4 text-lg fw-bold lh-base shadow-primary-lg transition-colors">
+            <span class="material-symbols-outlined me-2">auto_fix</span>
+            <span class="text-truncate">Generate Your First Code Now</span>
+        </a>
+    </section>
+
+    <section class="w-100 container-fluid py-5 px-3 px-sm-5 mx-auto" style="max-width: 1400px;">
+        <div class="position-relative d-flex justify-content-center mb-4">
+            <p class="text-muted small fw-semibold text-uppercase letter-spacing-2 bg-body px-3 position-relative z-2">
+                Trusted by leaders worldwide
+            </p>
+            <hr class="position-absolute top-50 w-100 border-top border-secondary-subtle z-1">
+        </div>
+
+        <div class="mx-auto mt-4 row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 align-items-center justify-content-center" style="max-width: 1000px;">
+
+            {% set logos = [
+                {'src': 'https://tailwindcss.com/plus-assets/img/logos/158x48/reform-logo-white.svg', 'alt': 'Global Logistics'},
+                {'src': 'https://tailwindcss.com/plus-assets/img/logos/158x48/transistor-logo-white.svg', 'alt': 'Retail Hub'},
+                {'src': 'https://tailwindcss.com/plus-assets/img/logos/158x48/savvycal-logo-white.svg', 'alt': 'Innovate Tech'},
+                {'src': 'https://tailwindcss.com/plus-assets/img/logos/158x48/statamic-logo-white.svg', 'alt': 'Packaging Pro'},
+                {'src': 'https://tailwindcss.com/plus-assets/img/logos/158x48/tuple-logo-white.svg', 'alt': 'Tech Solutions'}
+            ] %}
+
+            {% for logo in logos %}
+                <div class="col text-center">
+                    <img width="158" height="48"
+                        src="{{ logo.src }}"
+                        alt="{{ logo.alt }}"
+                        class="img-fluid opacity-90 client-logo" style="max-height: 40px; object-fit: contain;"
+                        loading="lazy"
+                    />
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section
+        class="w-100 container-fluid pt-4 pb-5 px-3 px-sm-5 mx-auto mb-5 rounded-3 border border-secondary-subtle" style="max-width: 1400px;">
+
+        <h2 class="fs-2 fs-md-1 fw-black text-center mb-2 tracking-neg-3">
+            Why Choose Barcode App?
+        </h2>
+        <p class="text-secondary-emphasis fs-5 fw-normal text-center mx-auto mb-5" style="max-width: 550px;">
+            The dedicated tool for professionals who demand speed, reliability, and versatility in their code generation.
+        </p>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+
+            <div class="col">
+                <div class="card h-100 p-3 shadow-sm border border-secondary-subtle transition-scale hover-scale-102 dark-card-custom">
+                    <div class="card-body">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
+                            <span class="material-symbols-outlined fs-3">deployed_code</span>
+                        </div>
+                        <h3 class="card-title fs-5 fw-bold mb-2">Multi-Format Support</h3>
+                        <p class="card-text text-secondary-emphasis">
+                            Generate Code128, EAN-13, UPC-A, DataMatrix, and high-density QR Codes used globally.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 p-3 shadow-sm border border-secondary-subtle transition-scale hover-scale-102 dark-card-custom">
+                    <div class="card-body">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
+                            <span class="material-symbols-outlined fs-3">download</span>
+                        </div>
+                        <h3 class="card-title fs-5 fw-bold mb-2">High-Resolution Output</h3>
+                        <p class="card-text text-secondary-emphasis">
+                            Export crisp PNG images ideal for packaging, printing, and automated scanning systems.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 p-3 shadow-sm border border-secondary-subtle transition-scale hover-scale-102 dark-card-custom">
+                    <div class="card-body">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
+                            <span class="material-symbols-outlined fs-3">scanner</span>
+                        </div>
+                        <h3 class="card-title fs-5 fw-bold mb-2">Integrated Scanner</h3>
+                        <p class="card-text text-secondary-emphasis">
+                            Validate generated codes instantly using the built-in scanner (Premium feature).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="w-100 container-fluid pt-5 pb-5 px-3 px-sm-5 text-center mx-auto">
+        <h2 class="display-4 fw-bolder lh-sm mb-3 tracking-neg-3 text-body">
+            Ready to Simplify Your Operations?
+        </h2>
+        <p class="text-secondary-emphasis fs-5 fw-normal lh-base mx-auto mb-5" style="max-width: 600px;">
+            Join thousands of businesses who trust Code Weaver. Start generating high-quality codes today.
+        </p>
+
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('generate_page') }}"
+                class="btn btn-primary d-inline-flex align-items-center justify-content-center overflow-hidden rounded-xl py-3 px-5 h-lg-4 text-lg fw-bold shadow-primary-lg hover-bg-primary-90 transition-colors">
+                Start Generating for Free
+            </a>
+
+            <a href="#"
+                class="btn btn-outline-secondary dark-btn-outline-light d-inline-flex align-items-center justify-content-center overflow-hidden rounded-xl py-3 px-5 h-lg-4 text-lg fw-bold transition-colors">
+                View Premium Plans
+            </a>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-center px-3 py-5">
+    <div class="w-100" style="max-width: 400px;">
+        <div class="bg-white dark-auth-card rounded-xl shadow-sm p-4 p-md-5">
+
+            <div class="text-center mb-4">
+                <h2 class="fs-2 fw-black text-body tracking-neg-3 mb-1">Login</h2>
+                <p class="small text-muted">Access your account to continue.</p>
+            </div>
+
+            {% if error %}
+            <div class="rounded-lg bg-danger-subtle text-danger p-3 small mb-4">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form action="{{ url_for('login_page') }}" method="POST" class="d-flex flex-column gap-4">
+
+                <div>
+                    <label for="username" class="form-label small fw-medium text-body mb-1">Username</label>
+                    <input type="text" id="username" name="username" required
+                        class="form-control rounded-lg form-control-sm dark-input-custom" />
+                </div>
+
+                <div>
+                    <label for="password" class="form-label small fw-medium text-body mb-1">Password</label>
+                    <input type="password" id="password" name="password" required
+                        class="form-control rounded-lg form-control-sm dark-input-custom" />
+                </div>
+
+                <button type="submit"
+                    class="btn btn-primary w-100 h-lg-2 d-flex align-items-center justify-content-center gap-2 small fw-medium rounded-lg hover-bg-primary-90 shadow-sm transition-colors">
+                    <span class="material-symbols-outlined fs-6">login</span>
+                    <span>Login</span>
+                </button>
+
+                <p class="text-center small text-muted mb-0">
+                    Don't have an account?
+                    <a href="{{ url_for('signup_page') }}" class="text-primary hover-link-underline">Sign up</a>
+                </p>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

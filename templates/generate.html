@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Generate Barcode/QR Code{% endblock %}
+
+{% block content %}
+
+<div class="d-flex flex-column w-100 position-relative">
+
+    <main class="d-flex flex-grow-1 flex-column align-items-center p-3 p-sm-4 p-md-5">
+
+        <div class="w-100" style="max-width: 1400px;">
+
+            <div class="d-flex flex-column gap-2 p-3 text-center">
+                <p class="fs-3 fs-md-2 fw-black lh-sm tracking-neg-3 text-body">
+                    Generate Barcode/QR Code
+                </p>
+                <p class="text-secondary-emphasis fs-6 fw-normal lh-base">
+                    Enter your data to create a scannable code instantly.
+                </p>
+            </div>
+
+            <div class="mt-4 row g-4">
+
+                <div class="col-12 col-lg-6">
+                    <form action="{{ url_for('generate_page') }}" method="POST">
+                        <div class="d-flex flex-column gap-4 rounded-xl p-4 p-md-5 bg-white border border-secondary-subtle dark-card-custom">
+
+                            <label class="d-flex flex-column w-100 form-label">
+                                <p class="fs-6 fw-medium pb-2 mb-0">
+                                    Enter Data (Text, URL, or Code)
+                                </p>
+                                <textarea id="inputData" name="data"
+                                    class="form-control resize-none rounded-lg text-body placeholder-text-muted border border-secondary-subtle bg-white dark-input-custom"
+                                    placeholder="e.g., https://www.example.com" maxlength="20" rows="6"
+                                    aria-label="Enter data for code generation"></textarea>
+                            </label>
+
+                            <label class="d-flex flex-column w-100 form-label">
+                                <p class="fs-6 fw-medium pb-2 mb-0">Select Barcode Type</p>
+                                <select id="barcodeType" name="barcode_type"
+                                    class="form-select rounded-lg h-lg-3 text-body border border-secondary-subtle bg-white dark-input-custom"
+                                    aria-label="Select barcode type">
+                                    <option>QR Code</option>
+                                    <option>Code128</option>
+                                    <option>EAN-13</option>
+                                    <option>UPC-A</option>
+                                    <option>DataMatrix</option>
+                                    <option>PDF417</option>
+                                </select>
+                            </label>
+
+                            <button id="generateBtn" type="submit"
+                                class="btn btn-primary d-flex w-100 align-items-center justify-content-center rounded-lg h-lg-3 px-4 fw-bold transition-colors">
+                                <span class="material-symbols-outlined me-2">qr_code_2</span>
+                                <span class="text-truncate">Generate Code</span>
+                            </button>
+
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="d-flex flex-column gap-4 rounded-xl p-4 p-md-5 bg-white border border-secondary-subtle dark-card-custom">
+
+                        <div class="d-flex flex-grow-1 align-items-center justify-content-center rounded-lg bg-light dark-output-bg-custom min-h-300 p-4">
+                            <div class="text-center">
+                                <img id="outputImage"
+                                    class="img-fluid mx-auto" style="height: 192px; width: 192px; max-width: 100%;"
+                                     {% if image == None %}
+                                        src="https://placehold.co/400x400?text=Your QR"
+                                     {% else %}
+                                        src="{{ url_for('serve_image', name=image) }}"
+                                     {% endif %}
+                                    alt="Generated code placeholder">
+                                <p class="mt-3 text-muted small fw-medium">
+                                    Your generated code will appear here
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row row-cols-3 g-3">
+                             {% if image != None %}
+                            <form action="{{ url_for('serve_image', name=image) }}" method="POST" class="col">
+                            {% endif %}
+                                <button id="downloadBtn" type="submit"
+                                    class="btn btn-outline-secondary dark-btn-outline-light d-flex w-100 align-items-center justify-content-center gap-2 h-lg-2 px-3 fw-medium transition-colors">
+                                    <span class="material-symbols-outlined fs-6">download</span>
+                                    <span>Download</span>
+                                </button>
+                            {% if image != None %}
+                            </form>
+                            {% endif %}
+
+                            <div class="col">
+                                <button id="copyBtn" type="button"
+                                    class="btn btn-outline-secondary dark-btn-outline-light d-flex w-100 align-items-center justify-content-center gap-2 h-lg-2 px-3 fw-medium transition-colors">
+                                    <span class="material-symbols-outlined fs-6">content_copy</span>
+                                    <span>Copy</span>
+                                </button>
+                            </div>
+
+                            <div class="col">
+                                <button id="printBtn" type="button"
+                                    class="btn btn-outline-secondary dark-btn-outline-light d-flex w-100 align-items-center justify-content-center gap-2 h-lg-2 px-3 fw-medium transition-colors">
+                                    <span class="material-symbols-outlined fs-6">print</span>
+                                    <span>Print</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button id="regenerateBtn" type="button"
+                            class="btn btn-secondary d-flex w-100 align-items-center justify-content-center rounded-lg h-lg-3 px-4 fw-bold bg-secondary-subtle dark-secondary-btn-custom transition-colors">
+                            <span class="material-symbols-outlined me-2">refresh</span>
+                            <span class="truncate">Regenerate</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+{% endblock %}
